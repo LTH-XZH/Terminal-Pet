@@ -6,9 +6,10 @@
 实时读取状态文件，根据编译结果改变表情和动画。
 
 子命令：
-  python pet.py           动画窗口（Ctrl+C 退出）
-  python pet.py --once    只打印当前心情的一帧（用于调试/脚本）
-  python pet.py --status  打印当前状态文件内容
+  python pet.py                动画窗口（Ctrl+C 退出）
+  python pet.py --name 名字    给宠物改名字（例如 --name 大橘）
+  python pet.py --once         只打印当前心情的一帧（用于调试/脚本）
+  python pet.py --status       打印当前状态文件内容
 """
 
 import json
@@ -40,11 +41,23 @@ def main():
 
 
 if __name__ == "__main__":
-    if "--once" in sys.argv:
+    if "--name" in sys.argv:
+        argv = sys.argv[1:]
+        idx = argv.index("--name")
+        name = argv[idx + 1] if idx + 1 < len(argv) else ""
+        if not name:
+            print("用法: pet --name <新名字>")
+            print("示例: pet --name 大橘")
+            sys.exit(2)
+        cfg = pc.load_config()
+        cfg["name"] = name
+        pc.save_config(cfg)
+        print("已把宠物名字改为「%s」。重新打开宠物窗口（pet）即可看到。" % name)
+    elif "--once" in sys.argv:
         state = pc.load_state()
         mood = pc.decide_mood(state)
-        rows = pc.render_rows(mood, 0, state, pc.load_config()["name"],
-                              header="终端宠物 · 快照")
+        name = pc.load_config()["name"]
+        rows = pc.render_rows(mood, 0, state, name, header="终端宠物 · %s · 快照" % name)
         print("\n".join(rows))
     elif "--status" in sys.argv:
         print(json.dumps(pc.load_state(), ensure_ascii=False, indent=2))

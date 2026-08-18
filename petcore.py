@@ -106,15 +106,30 @@ SLEEP_AFTER_SEC = 300    # 空闲 5 分钟后开始打盹
 # ------------------------------------------------------------------ 配置
 DEFAULT_NAME = "小喵"
 
+def save_config(cfg):
+    """写配置文件（原子替换）。失败时静默返回 False，不影响运行。"""
+    try:
+        os.makedirs(STATE_DIR, exist_ok=True)
+        tmp = CONFIG_FILE + ".tmp"
+        with open(tmp, "w", encoding="utf-8") as f:
+            json.dump(cfg, f, ensure_ascii=False, indent=2)
+        os.replace(tmp, CONFIG_FILE)
+        return True
+    except Exception:
+        return False
+
 def load_config():
+    """读取配置；文件不存在时自动生成默认配置，方便用户直接编辑。"""
     cfg = dict(name=DEFAULT_NAME)
     try:
         with open(CONFIG_FILE, "r", encoding="utf-8") as f:
             data = json.load(f)
-        if isinstance(data, dict) and isinstance(data.get("name"), str):
-            cfg["name"] = data["name"]
+        if isinstance(data, dict) and isinstance(data.get("name"), str) and data["name"].strip():
+            cfg["name"] = data["name"].strip()
+    except FileNotFoundError:
+        save_config(cfg)   # 首次运行：生成 config.json，便于直接改名字
     except Exception:
-        pass
+        pass               # 配置损坏时退回默认名字，不报错
     return cfg
 
 # ------------------------------------------------------------------ 状态文件
