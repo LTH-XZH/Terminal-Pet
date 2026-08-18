@@ -11,9 +11,16 @@
 
 ## 快速开始
 
-### 0. 安装到 PATH（推荐，做一次即可）
 
-在项目目录里运行一次安装脚本：
+
+### 0. 安装到 PATH（推荐，做一次即可）
+先将本仓库克隆到本地：
+
+```pwershell
+git clone https://github.com/LTH-XZH/Terminal-Pet.git
+```
+
+在目录"Terminal_Pet"里运行一次安装脚本：
 
 ```powershell
 .\install.ps1
@@ -25,6 +32,8 @@
 > 只想临时用、不想改环境变量：`.\install.ps1 -NoPersist`（仅当前终端生效）。
 
 ### 1. 打开宠物窗口（新开一个终端标签页/窗格）
+
+在项目父目录下输入：
 
 ```bash
 pet
